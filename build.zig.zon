@@ -1,0 +1,17 @@
+.{
+    .name = .zbox3d,
+    .version = "0.0.0",
+    .fingerprint = 0x7f9ab5e5318a9f4e,
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{
+        .box3d = .{
+            .url = "git+https://github.com/erincatto/box3d#c52908c9a907714e4d3a8a30be5272a1761158e1",
+            .hash = "N-V-__8AAP9nsQAa8wNoj3b0UePzOweNWEssNIi5KGWM9X1E",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
