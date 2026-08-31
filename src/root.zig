@@ -1965,29 +1965,29 @@ test "all wrapper declarations compile" {
 }
 
 test "hello world" {
-    var worldDef = defaultWorldDef();
-    worldDef.gravity = .{ .x = 0, .y = -10, .z = 0 };
-    const world = try World.create(&worldDef);
+    var world_def = defaultWorldDef();
+    world_def.gravity = .{ .x = 0, .y = -10, .z = 0 };
+    const world = try World.create(&world_def);
 
-    var groundDef = defaultBodyDef();
-    groundDef.position = .{ .x = 0, .y = -10, .z = 0 };
-    const ground = World.createBody(world, &groundDef);
+    var ground_def = defaultBodyDef();
+    ground_def.position = .{ .x = 0, .y = -10, .z = 0 };
+    const ground = World.createBody(world, &ground_def);
     const groundBox = makeBoxHull(50, 10, 50);
     const groundShapeDef = defaultShapeDef();
     _ = ground.createHullShape(&groundShapeDef, &groundBox.base);
 
-    var bodyDef = defaultBodyDef();
-    bodyDef.type = @intFromEnum(BodyType.dynamic);
-    bodyDef.position = .{ .x = 0, .y = 4, .z = 0 };
-    const body = world.createBody(&bodyDef);
-    const dynamicBox = makeCubeHull(1);
-    var shapeDef = defaultShapeDef();
-    shapeDef.density = 1;
-    shapeDef.baseMaterial.friction = 0.3;
-    _ = Body.createHullShape(body, &shapeDef, &dynamicBox.base);
+    var body_def = defaultBodyDef();
+    body_def.type = @intFromEnum(BodyType.dynamic);
+    body_def.position = .{ .x = 0, .y = 4, .z = 0 };
+    const body = world.createBody(&body_def);
+    const dynamic_box = makeCubeHull(1);
+    var shape_def = defaultShapeDef();
+    shape_def.density = 1;
+    shape_def.baseMaterial.friction = 0.3;
+    _ = Body.createHullShape(body, &shape_def, &dynamic_box.base);
 
-    const timeStep: f32 = @as(f32, 1) / 60;
-    const subStepCount = 4;
+    const time_step: f32 = @as(f32, 1) / 60;
+    const sub_step_count = 4;
 
     const position = body.getPosition();
     try std.testing.expectEqual(position.x, 0);
@@ -1995,14 +1995,14 @@ test "hello world" {
     try std.testing.expectEqual(position.z, 0);
 
     for (0..90) |_| {
-        world.step(timeStep, subStepCount);
+        world.step(time_step, sub_step_count);
     }
 
     const target = .{ .x = -0.00567714, .y = 0.9999298, .z = 0.010617549 };
-    const finalPosition = body.getPosition();
-    try std.testing.expectEqual(finalPosition.x, target.x);
-    try std.testing.expectEqual(finalPosition.y, target.y);
-    try std.testing.expectEqual(finalPosition.z, target.z);
+    const position_end = body.getPosition();
+    try std.testing.expectEqual(position_end.x, target.x);
+    try std.testing.expectEqual(position_end.y, target.y);
+    try std.testing.expectEqual(position_end.z, target.z);
 }
 
 test "sphere falls onto ground box and comes to rest" {
