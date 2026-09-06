@@ -2137,3 +2137,53 @@ test "revolute joint connects two bodies" {
 
     joint.destroy(true);
 }
+
+test "record and replay" {
+    const e = 0.1;
+    var world_def = defaultWorldDef();
+    const world = try World.create(&world_def);
+    defer world.destroy();
+
+    var ground_def = defaultBodyDef();
+    ground_def.position = .{ .x = 0, .y = -10, .z = 0 };
+    const ground = World.createBody(world, &ground_def);
+    const groundBox = makeBoxHull(50, 10, 50);
+    const groundShapeDef = defaultShapeDef();
+    _ = ground.createHullShape(&groundShapeDef, &groundBox.base);
+
+    var body_def = defaultBodyDef();
+    body_def.type = @intFromEnum(BodyType.dynamic);
+    body_def.position = .{ .x = 0, .y = 4, .z = 0 };
+    var body = world.createBody(&body_def);
+    const dynamic_box = makeCubeHull(1);
+    var shape_def = defaultShapeDef();
+    shape_def.density = 1;
+    shape_def.baseMaterial.friction = 0.3;
+    _ = Body.createHullShape(body, &shape_def, &dynamic_box.base);
+
+    const recording = Recording.create(10 * 1024).?;
+    recording.startRecording(world);
+    recording.stopRecording(world);
+
+    const player = RecPlayer.fromRecording(recording, 1).?;
+    const world_new = player.getWorld();
+    body.id.world0 = 2;
+
+    const time_step: f32 = @as(f32, 1) / 60;
+    const sub_step_count = 4;
+
+    const position = body.getPosition();
+    try std.testing.expectApproxEqAbs(0, position.x, e);
+    try std.testing.expectApproxEqAbs(4, position.y, e);
+    try std.testing.expectApproxEqAbs(0, position.z, e);
+
+    for (0..90) |_| {
+        world_new.step(time_step, sub_step_count);
+    }
+
+    const target = .{ .x = 0, .y = 1, .z = 0 };
+    const position_end = body.getPosition();
+    try std.testing.expectApproxEqAbs(target.x, position_end.x, e);
+    try std.testing.expectApproxEqAbs(target.y, position_end.y, e);
+    try std.testing.expectApproxEqAbs(target.z, position_end.z, e);
+}
