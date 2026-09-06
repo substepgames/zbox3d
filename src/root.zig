@@ -220,10 +220,6 @@ pub fn getMaxWorldCount() i32 {
     return c.b3GetMaxWorldCount();
 }
 
-// ---------------------------------------------------------------------------
-// World
-// ---------------------------------------------------------------------------
-
 pub const World = extern struct {
     id: c.b3WorldId,
 
