@@ -1941,6 +1941,52 @@ pub const WheelJoint = extern struct {
     }
 };
 
+pub const Recording = extern struct {
+    recording: *c.b3Recording,
+
+    pub fn create(byte_capacity: i32) ?Recording {
+        const recording = c.b3CreateRecording(byte_capacity);
+        return if (recording) |rec| .{ .recording = rec } else null;
+    }
+
+    pub fn destroy(self: Recording) void {
+        c.b3DestroyRecording(self.recording);
+    }
+
+    pub fn startRecording(self: Recording, world: World) void {
+        c.b3World_StartRecording(world.id, self.recording);
+    }
+
+    pub fn stopRecording(self: Recording, world: World) void {
+        _ = self;
+        c.b3World_StopRecording(world.id);
+    }
+
+    pub fn getData(self: Recording) []const u8 {
+        const data = c.b3Recording_GetData(self.recording);
+        return data[0..@intCast(c.b3Recording_GetSize(self.recording))];
+    }
+};
+
+pub const RecPlayer = extern struct {
+    rec_player: *c.b3RecPlayer,
+
+    pub fn create(data: []const u8, worker_count: i32) ?RecPlayer {
+        const player = c.b3CreatePlayer(data.ptr, @intCast(data.len), worker_count);
+        return if (player) |p| .{ .rec_player = p } else null;
+    }
+
+    pub fn fromRecording(recording: Recording, worker_count: i32) ?RecPlayer {
+        const data = recording.getData();
+        return create(data, worker_count);
+    }
+
+    pub fn getWorld(self: RecPlayer) World {
+        const id = c.b3RecPlayer_GetWorldId(self.rec_player);
+        return .{ .id = id };
+    }
+};
+
 // Forces semantic analysis of every wrapper method, so a signature drift
 // against the C API is caught by `zig build test` even for methods no test
 // calls directly.
