@@ -1987,6 +1987,16 @@ pub const RecPlayer = extern struct {
     }
 };
 
+pub fn saveSnapshot(world: World) []const u8 {
+    var rb: c.b3RecBuffer = .{};
+    _ = c.b3SaveSnapshot(world.id, &rb);
+    return rb.data[0..@intCast(rb.size)];
+}
+
+pub fn restoreSnapshot(buf: []const u8, world: World) void {
+    _ = c.b3RestoreSnapshot(buf.ptr, @intCast(buf.len), world.id);
+}
+
 // Forces semantic analysis of every wrapper method, so a signature drift
 // against the C API is caught by `zig build test` even for methods no test
 // calls directly.
