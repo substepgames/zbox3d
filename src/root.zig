@@ -2148,7 +2148,7 @@ test "revolute joint connects two bodies" {
     joint.destroy(true);
 }
 
-test "record and replay" {
+test "save and restore" {
     const e = 0.1;
     var world_def = defaultWorldDef();
     const world = try World.create(&world_def);
@@ -2171,13 +2171,8 @@ test "record and replay" {
     shape_def.baseMaterial.friction = 0.3;
     _ = Body.createHullShape(body, &shape_def, &dynamic_box.base);
 
-    const recording = Recording.create(10 * 1024).?;
-    recording.startRecording(world);
-    recording.stopRecording(world);
-
-    const player = RecPlayer.fromRecording(recording, 1).?;
-    const world_new = player.getWorld();
-    body.id.world0 = 2;
+    const snapshot = saveSnapshot(world);
+    restoreSnapshot(snapshot, world);
 
     const time_step: f32 = @as(f32, 1) / 60;
     const sub_step_count = 4;
@@ -2188,7 +2183,7 @@ test "record and replay" {
     try std.testing.expectApproxEqAbs(0, position.z, e);
 
     for (0..90) |_| {
-        world_new.step(time_step, sub_step_count);
+        world.step(time_step, sub_step_count);
     }
 
     const target = .{ .x = 0, .y = 1, .z = 0 };
