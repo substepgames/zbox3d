@@ -1126,6 +1126,14 @@ pub const Joint = extern struct {
         return c.b3Joint_GetCollideConnected(self.id);
     }
 
+    pub fn setEnabled(self: Joint, enabled: bool) void {
+        c.b3Joint_SetEnabled(self.id, enabled);
+    }
+
+    pub fn getEnabled(self: Joint) bool {
+        return c.b3Joint_GetEnabled(self.id);
+    }
+
     pub fn setUserData(self: Joint, user_data: ?*anyopaque) void {
         c.b3Joint_SetUserData(self.id, user_data);
     }
